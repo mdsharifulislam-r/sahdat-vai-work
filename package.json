@@ -4,7 +4,7 @@
   "description": "Backend API for User Management System with MongoDB",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node ./api/index.js",
     "dev": "nodemon ./api/index.js",
     "test": "jest",
     "seed": "node scripts/seed.js"
