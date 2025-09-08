@@ -155,7 +155,7 @@ app.post('/api/admin/login', async (req, res) => {
     const { password } = req.body;
     
     // Simple password check (you can enhance this)
-    if (password === 'admin123') {
+    if (password === process.env.ADMIN_PASSWORD) {
       const token = jwt.sign(
         { isAdmin: true }, 
         process.env.JWT_SECRET || 'fallback_secret',
@@ -480,5 +480,6 @@ app.listen(PORT, () => {
   console.log(`Health check: http://localhost:${PORT}/api/health`);
 });
 
+
+
 module.exports = app;
-module.exports.handler = serverless(app);
