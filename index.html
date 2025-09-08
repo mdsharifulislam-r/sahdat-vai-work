@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-semibold text-gray-900">User Management System</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="currentUser" class="text-sm text-gray-600"></span>
+                    <button id="logoutBtn" class="hidden bg-red-500 text-white px-4 py-2 rounded-md text-sm hover:bg-red-600">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Login Section -->
+    <div id="loginSection" class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div>
+                <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
+            </div>
+            <div class="mt-8 space-y-6">
+                <div class="bg-white p-8 rounded-lg shadow">
+                    <div class="space-y-4">
+                        <div>
+                            <label for="loginType" class="block text-sm font-medium text-gray-700">Login Type</label>
+                            <select id="loginType" name="loginType" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <option value="admin">Admin</option>
+                                <option value="user">User</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="loginId" class="block text-sm font-medium text-gray-700">User ID / Admin Password</label>
+                            <input type="text" id="loginId" name="loginId" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Enter your ID or password">
+                        </div>
+                        <button id="loginBtn" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Sign In
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="hidden max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Admin Header -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900">Admin Dashboard</h2>
+            <p class="text-gray-600">Manage users and their monthly deposits</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex items-center">
+                    <div class="p-2 bg-blue-100 rounded-lg">
+                        <i data-feather="users" class="h-6 w-6 text-blue-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Total Users</p>
+                        <p id="totalUsers" class="text-2xl font-bold text-gray-900">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex items-center">
+                    <div class="p-2 bg-green-100 rounded-lg">
+                        <i data-feather="dollar-sign" class="h-6 w-6 text-green-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Total Deposits</p>
+                        <p id="totalDeposits" class="text-2xl font-bold text-gray-900">$0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex items-center">
+                    <div class="p-2 bg-purple-100 rounded-lg">
+                        <i data-feather="calendar" class="h-6 w-6 text-purple-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">This Month</p>
+                        <p id="thisMonthDeposits" class="text-2xl font-bold text-gray-900">$0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mb-6 flex flex-wrap gap-4">
+            <button id="addUserBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center">
+                <i data-feather="plus" class="h-4 w-4 mr-2"></i>
+                Add User
+            </button>
+            <button id="addDepositBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center">
+                <i data-feather="dollar-sign" class="h-4 w-4 mr-2"></i>
+                Add Deposit
+            </button>
+        </div>
+
+        <!-- Users Table -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <div class="px-6 py-4 border-b">
+                <h3 class="text-lg font-medium text-gray-900">Users</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Deposits</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTable" class="bg-white divide-y divide-gray-200">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Dashboard -->
+    <div id="userDashboard" class="hidden max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900">User Dashboard</h2>
+            <p class="text-gray-600">View your deposit history and profile information</p>
+        </div>
+
+        <!-- User Profile Card -->
+        <div id="userProfile" class="bg-white shadow rounded-lg p-6 mb-8">
+            <div class="flex items-center space-x-6">
+                <img id="userImage" class="h-20 w-20 rounded-full object-cover bg-gray-200" src="" alt="User Image">
+                <div>
+                    <h3 id="userName" class="text-xl font-bold text-gray-900"></h3>
+                    <p id="userEmail" class="text-gray-600"></p>
+                    <p id="userContact" class="text-gray-600"></p>
+                    <p class="text-sm text-gray-500">ID: <span id="userIdDisplay"></span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Deposit History -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <div class="px-6 py-4 border-b">
+                <h3 class="text-lg font-medium text-gray-900">Deposit History</h3>
+            </div>
+            <div id="userDeposits" class="p-6">
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Add/Edit User -->
+    <div id="userModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <h3 class="text-lg font-medium text-gray-900 mb-4" id="modalTitle">Add User</h3>
+                <form id="userForm" class="space-y-4">
+                    <div>
+                        <label for="userName" class="block text-sm font-medium text-gray-700">Name</label>
+                        <input type="text" id="userName" name="name" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="userEmail" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" id="userEmail" name="email" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="userContact" class="block text-sm font-medium text-gray-700">Contact</label>
+                        <input type="tel" id="userContact" name="contact" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="userImageUrl" class="block text-sm font-medium text-gray-700">Image URL</label>
+                        <input type="url" id="userImageUrl" name="image" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button type="button" id="cancelBtn" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">Cancel</button>
+                        <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Add Deposit -->
+    <div id="depositModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Add Deposit</h3>
+                <form id="depositForm" class="space-y-4">
+                    <div>
+                        <label for="depositUserId" class="block text-sm font-medium text-gray-700">Select User</label>
+                        <select id="depositUserId" name="userId" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Choose a user...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="depositAmount" class="block text-sm font-medium text-gray-700">Amount</label>
+                        <input type="number" id="depositAmount" name="amount" required min="0" step="0.01" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="depositMonth" class="block text-sm font-medium text-gray-700">Month</label>
+                        <input type="month" id="depositMonth" name="month" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button type="button" id="cancelDepositBtn" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">Cancel</button>
+                        <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700">Add Deposit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Base URL for API
+        const BASE_URL = "http://localhost:3000";
+
+        // Application state
+        let currentUser = null;
+        let isAdmin = false;
+        let editingUserId = null;
+
+        // Initialize feather icons
+        function initFeatherIcons() {
+            if (typeof feather !== 'undefined') {
+                feather.replace();
+            }
+        }
+
+        // Check for existing session on page load
+        function checkSession() {
+            const token = localStorage.getItem('token');
+            const storedUser = localStorage.getItem('currentUser');
+            const storedIsAdmin = localStorage.getItem('isAdmin');
+
+            if (token && storedUser && storedIsAdmin !== null) {
+                currentUser = JSON.parse(storedUser);
+                isAdmin = storedIsAdmin === 'true';
+                showDashboard();
+            }
+        }
+
+        // Login functionality
+        document.getElementById('loginBtn').addEventListener('click', async () => {
+            const loginType = document.getElementById('loginType').value;
+            const loginId = document.getElementById('loginId').value.trim();
+
+            if (!loginId) {
+                alert('Please enter your ID or password');
+                return;
+            }
+
+            try {
+                let res;
+                if (loginType === 'admin') {
+                    res = await fetch(`${BASE_URL}/api/admin/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ password: loginId }),
+                    });
+                } else {
+                    res = await fetch(`${BASE_URL}/api/user/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userId: loginId }),
+                    });
+                }
+
+                const data = await res.json();
+                if (data.success) {
+                    localStorage.setItem('token', data.token);
+                    currentUser = data.user;
+                    isAdmin = loginType === 'admin';
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    localStorage.setItem('isAdmin', isAdmin.toString());
+                    showDashboard();
+                } else {
+                    alert(data.message || 'Invalid credentials');
+                }
+            } catch (err) {
+                console.error('Login error:', err);
+                alert('Error connecting to server');
+            }
+        });
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('isAdmin');
+            currentUser = null;
+            isAdmin = false;
+            document.getElementById('adminDashboard').classList.add('hidden');
+            document.getElementById('userDashboard').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('logoutBtn').classList.add('hidden');
+            document.getElementById('loginId').value = '';
+        });
+
+        // Show dashboard
+        async function showDashboard() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('currentUser').textContent = isAdmin ? 'Admin' : currentUser.name;
+            document.getElementById('logoutBtn').classList.remove('hidden');
+
+            if (isAdmin) {
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                await loadAdminDashboard();
+            } else {
+                document.getElementById('userDashboard').classList.remove('hidden');
+                await loadUserDashboard();
+            }
+            initFeatherIcons();
+        }
+
+        // Load admin dashboard
+        async function loadAdminDashboard() {
+            try {
+                // Fetch stats
+                const statsRes = await fetch(`${BASE_URL}/api/stats`, {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                });
+                const statsData = await statsRes.json();
+                if (statsData.success) {
+                    updateStats(statsData.stats);
+                } else {
+                    alert(statsData.message || 'Failed to load stats');
+                }
+
+                // Fetch users with deposits
+                const usersRes = await fetch(`${BASE_URL}/api/users-with-deposits`, {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                });
+                const usersData = await usersRes.json();
+                if (usersData.success) {
+                    loadUsersTable(usersData.users);
+                    loadUserSelect(usersData.users);
+                } else {
+                    alert(usersData.message || 'Failed to load users');
+                }
+            } catch (err) {
+                console.error('Error loading admin dashboard:', err);
+                alert('Error connecting to server');
+            }
+        }
+
+        // Update stats
+        function updateStats(stats) {
+            document.getElementById('totalUsers').textContent = stats.totalUsers;
+            document.getElementById('totalDeposits').textContent = `$${stats.totalDeposits.toFixed(2)}`;
+            document.getElementById('thisMonthDeposits').textContent = `$${stats.thisMonthDeposits.toFixed(2)}`;
+        }
+
+        // Load users table
+        function loadUsersTable(users) {
+            const tbody = document.getElementById('usersTable');
+            tbody.innerHTML = '';
+
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <img class="h-10 w-10 rounded-full object-cover bg-gray-200" src="${user.image || 'https://via.placeholder.com/40'}" alt="${user.name}">
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">${user.name}</div>
+                                <div class="text-sm text-gray-500">${user.email}</div>
+                                <div class="text-xs text-gray-400">ID: ${user.userId}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${user.contact}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$${user.totalDeposits.toFixed(2)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onclick="editUser('${user.userId}')" class="text-blue-600 hover:text-blue-900 mr-4">Edit</button>
+                        <button onclick="deleteUser('${user.userId}')" class="text-red-600 hover:text-red-900">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Load user select for deposits
+        async function loadUserSelect(users = null) {
+            try {
+                if (!users) {
+                    const res = await fetch(`${BASE_URL}/api/users`, {
+                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                    });
+                    const data = await res.json();
+                    if (!data.success) {
+                        alert(data.message || 'Failed to load users');
+                        return;
+                    }
+                    users = data.users;
+                }
+                const select = document.getElementById('depositUserId');
+                select.innerHTML = '<option value="">Choose a user...</option>';
+                users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.userId;
+                    option.textContent = `${user.name} (${user.userId})`;
+                    select.appendChild(option);
+                });
+            } catch (err) {
+                console.error('Error loading user select:', err);
+                alert('Error connecting to server');
+            }
+        }
+
+        // Add user modal
+        document.getElementById('addUserBtn').addEventListener('click', () => {
+            editingUserId = null;
+            document.getElementById('modalTitle').textContent = 'Add User';
+            const userForm = document.getElementById('userForm');
+            userForm.reset();
+            document.getElementById('userModal').classList.remove('hidden');
+        });
+
+        // Edit user
+        async function editUser(userId) {
+            try {
+                const res = await fetch(`${BASE_URL}/api/users/${userId}`, {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                });
+                const data = await res.json();
+                if (data.success) {
+                    editingUserId = userId;
+                    document.getElementById('modalTitle').textContent = 'Edit User';
+                    const userForm = document.getElementById('userForm');
+                    userForm.reset(); // Reset to clear previous values
+                    document.getElementById('userName').value = data.user.name || '';
+                    document.getElementById('userEmail').value = data.user.email || '';
+                    document.getElementById('userContact').value = data.user.contact || '';
+                    document.getElementById('userImageUrl').value = data.user.image || '';
+                    document.getElementById('userModal').classList.remove('hidden');
+                } else {
+                    alert(data.message || 'User not found');
+                }
+            } catch (err) {
+                console.error('Error fetching user:', err);
+                alert('Error connecting to server');
+            }
+        }
+
+        // Delete user
+        async function deleteUser(userId) {
+            if (confirm('Are you sure you want to delete this user? This will also delete all their deposits.')) {
+                try {
+                    const res = await fetch(`${BASE_URL}/api/users/${userId}`, {
+                        method: 'DELETE',
+                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        alert('User deleted successfully');
+                        await loadAdminDashboard();
+                    } else {
+                        alert(data.message || 'Failed to delete user');
+                    }
+                } catch (err) {
+                    console.error('Error deleting user:', err);
+                    alert('Error connecting to server');
+                }
+            }
+        }
+
+        // User form submission
+        document.getElementById('userForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Use FormData to collect form values
+            const form = document.getElementById('userForm');
+            const formData = new FormData(form);
+
+            // Debug: Log form elements and values
+            const userNameInput = document.getElementById('userName');
+            const userEmailInput = document.getElementById('userEmail');
+            const userContactInput = document.getElementById('userContact');
+            const userImageUrlInput = document.getElementById('userImageUrl');
+            console.log('Form elements:', {
+                userNameInput: userNameInput,
+                userEmailInput: userEmailInput,
+                userContactInput: userContactInput,
+                userImageUrlInput: userImageUrlInput
+            });
+            console.log('Form values:', {
+                name: userNameInput.value,
+                email: userEmailInput.value,
+                contact: userContactInput.value,
+                image: userImageUrlInput.value
+            });
+
+            // Collect and validate form data
+            const userData = {
+                name: formData.get('name')?.trim() || '',
+                email: formData.get('email')?.trim() || '',
+                contact: formData.get('contact')?.trim() || '',
+                image: formData.get('image')?.trim() || 'https://via.placeholder.com/150',
+            };
+
+            // Validate required fields
+            if (!userData.name || !userData.email || !userData.contact) {
+                alert('Please fill in all required fields (Name, Email, Contact).');
+                return;
+            }
+
+            try {
+                const url = editingUserId ? `${BASE_URL}/api/users/${editingUserId}` : `${BASE_URL}/api/users`;
+                const method = editingUserId ? 'PUT' : 'POST';
+                const res = await fetch(url, {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                    body: JSON.stringify(userData),
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(editingUserId ? 'User updated successfully' : 'User added successfully');
+                    document.getElementById('userModal').classList.add('hidden');
+                    await loadAdminDashboard();
+                } else {
+                    alert(data.message || 'Failed to save user');
+                }
+            } catch (err) {
+                console.error('Error saving user:', err);
+                alert('Error connecting to server');
+            }
+        });
+
+        // Add deposit modal
+        document.getElementById('addDepositBtn').addEventListener('click', () => {
+            document.getElementById('depositForm').reset();
+            document.getElementById('depositMonth').value = new Date().toISOString().substr(0, 7);
+            document.getElementById('depositModal').classList.remove('hidden');
+            loadUserSelect();
+        });
+
+        // Deposit form submission
+        document.getElementById('depositForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const depositData = {
+                userId: document.getElementById('depositUserId').value,
+                amount: parseFloat(document.getElementById('depositAmount').value),
+                month: document.getElementById('depositMonth').value,
+            };
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/deposits`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                    body: JSON.stringify(depositData),
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(data.message || 'Deposit added successfully');
+                    document.getElementById('depositModal').classList.add('hidden');
+                    await loadAdminDashboard();
+                } else {
+                    alert(data.message || 'Failed to add deposit');
+                }
+            } catch (err) {
+                console.error('Error adding deposit:', err);
+                alert('Error connecting to server');
+            }
+        });
+
+        // Modal close buttons
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            document.getElementById('userModal').classList.add('hidden');
+        });
+
+        document.getElementById('cancelDepositBtn').addEventListener('click', () => {
+            document.getElementById('depositModal').classList.add('hidden');
+        });
+
+        // Load user dashboard
+        async function loadUserDashboard() {
+            try {
+                document.getElementById('userName').textContent = currentUser.name || '';
+                document.getElementById('userEmail').textContent = currentUser.email || '';
+                document.getElementById('userContact').textContent = currentUser.contact || '';
+                document.getElementById('userIdDisplay').textContent = currentUser.id || '';
+                document.getElementById('userImage').src = currentUser.image || 'https://via.placeholder.com/150';
+
+                // Fetch user deposits
+                const res = await fetch(`${BASE_URL}/api/deposits/user/${currentUser.id}`, {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                });
+                const data = await res.json();
+                if (data.success) {
+                    const depositsContainer = document.getElementById('userDeposits');
+                    if (data.deposits.length === 0) {
+                        depositsContainer.innerHTML = '<p class="text-gray-500">No deposits found.</p>';
+                        return;
+                    }
+
+                    // Group deposits by month
+                    const depositsByMonth = {};
+                    data.deposits.forEach(deposit => {
+                        if (!depositsByMonth[deposit.month]) {
+                            depositsByMonth[deposit.month] = [];
+                        }
+                        depositsByMonth[deposit.month].push(deposit);
+                    });
+
+                    let depositsHtml = '';
+                    Object.keys(depositsByMonth).sort().reverse().forEach(month => {
+                        const monthDeposits = depositsByMonth[month];
+                        const monthTotal = monthDeposits.reduce((sum, d) => sum + d.amount, 0);
+                        const monthName = `${monthDeposits[0].monthName} ${monthDeposits[0].year}`;
+
+                        depositsHtml += `
+                            <div class="mb-6">
+                                <h4 class="text-lg font-medium text-gray-900 mb-3">${monthName}</h4>
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <p class="text-2xl font-bold text-green-600 mb-2">$${monthTotal.toFixed(2)}</p>
+                                    <p class="text-sm text-gray-600">${monthDeposits.length} deposit${monthDeposits.length !== 1 ? 's' : ''}</p>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    depositsContainer.innerHTML = depositsHtml;
+                } else {
+                    alert(data.message || 'Failed to load deposits');
+                }
+            } catch (err) {
+                console.error('Error loading user dashboard:', err);
+                alert('Error connecting to server');
+            }
+        }
+
+        // Set default deposit month to current month
+        document.getElementById('depositMonth').value = new Date().toISOString().substr(0, 7);
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            initFeatherIcons();
+            checkSession();
+        });
+    </script>
+</body>
+</html>
