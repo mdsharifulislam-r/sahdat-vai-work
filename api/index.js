@@ -12,7 +12,10 @@ require('dotenv').config();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin:["https://sahdat-vai-work.vercel.app"],
+  credentials:true
+}));
 app.use(express.json());
 app.use(express.static('public'));
 
@@ -145,13 +148,6 @@ const authenticateAdmin = (req, res, next) => {
 
 // Routes
 
-app.get("/",(req,res)=>{
-
-    const filePath = path.join(process.cwd(),"./index.html")
-
-    res.sendFile(filePath)
-
-})
 
 // Admin Authentication
 app.post('/api/admin/login', async (req, res) => {
